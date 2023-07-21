@@ -1,4 +1,5 @@
 <?php
+//BT1
 function sum_product_diff_quotient($arr) {
     $sum = $arr[0];
     $product = $arr[0];
