@@ -1,48 +1,56 @@
 <?php
+require_once 'model/Book.php';
+require_once 'model/BookList.php';
+
 class BookController {
-    private $books;
+    private $bookList;
 
     public function __construct() {
-        $this->books = array();
+        $this->bookList = new BookList();
     }
 
-    public function addBook($book) {
-        array_push($this->books, $book);
+    public function index() {
+        $books = $this->bookList->getAllBooks();
+        require 'view/book-list.php';
     }
 
-    public function removeBook($book) {
-        $index = array_search($book, $this->books);
-        if ($index !== false) {
-            array_splice($this->books, $index, 1);
+    public function addBook() {
+        $book1 = new Book("PHP 7 Programming", "David Powers", "Peachpit Press", 2016, "9780134291253", array("Introduction to PHP", "Working with Variables"));
+        $book2 = new Book("Learning PHP, MySQL & JavaScript", "Robin Nixon", "O'Reilly Media, Inc.", 2018, "9781491978917", array("The PHP Language", "PHP & MySQL"));
+        $book3 = new Book("JavaScript: The Definitive Guide", "David Flanagan", "O'Reilly Media, Inc.", 2011, "9780596805531", array("Introduction to JavaScript", "Working with Objects"));
+
+        $this->bookList->addBook($book1);
+        $this->bookList->addBook($book2);
+        $this->bookList->addBook($book3);
+
+       $this->index();
+    }
+
+    public function sortBooks() {
+        $sortType = isset($_GET['sort']) ? $_GET['sort'] : 'author';
+        $book1 = new Book("PHP 7 Programming", "David Powers", "Peachpit Press", 2016, "9780134291253", array("Introduction to PHP", "Working with Variables"));
+        $book2 = new Book("Learning PHP, MySQL & JavaScript", "Robin Nixon", "O'Reilly Media, Inc.", 2018, "9781491978917", array("The PHP Language", "PHP & MySQL"));
+        $book3 = new Book("JavaScript: The Definitive Guide", "David Flanagan", "O'Reilly Media, Inc.", 2011, "9780596805531", array("Introduction to JavaScript", "Working with Objects"));
+
+        $this->bookList->addBook($book1);
+        $this->bookList->addBook($book2);
+        $this->bookList->addBook($book3);
+
+        switch ($sortType) {
+            case 'author':
+                $this->bookList->sortBooksByAuthor();
+                break;
+            case 'title':
+                $this->bookList->sortBooksByTitle();
+                break;
+            case 'year':
+                $this->bookList->sortBooksByPublicationYear();
+                break;
+            default:
+                break;
         }
-    }
 
-    public function updateBook($oldBook, $newBook) {
-        $index = array_search($oldBook, $this->books);
-        if ($index !== false) {
-            $this->books[$index] = $newBook;
-        }
-    }
-
-    public function getBooks() {
-        return $this->books;
-    }
-
-    public function sortBooksByAuthor() {
-        usort($this->books, function($a, $b) {
-            return strcmp($a->getAuthor(), $b->getAuthor());
-        });
-    }
-
-    public function sortBooksByTitle() {
-        usort($this->books, function($a, $b) {
-            return strcmp($a->getTitle(), $b->getTitle());
-        });
-    }
-
-    public function sortBooksByYear() {
-        usort($this->books, function($a, $b) {
-            return $a->getYear() - $b->getYear();
-        });
+        $this->index();
     }
 }
+?>
